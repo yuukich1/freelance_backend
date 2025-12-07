@@ -1,8 +1,4 @@
 ---
-# 
-
----
----
 # Freelance Platform Backend
 
 Это backend для сервиса фрилансеров, написанный на Python с использованием FastAPI.
