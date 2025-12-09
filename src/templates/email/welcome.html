@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <style>
+      body { background: #f5f5f5; margin: 0; padding: 32px 0; }
+      .container {
+        max-width: 480px;
+        margin: 0 auto;
+        padding: 24px;
+        background: #ffffff;
+        border-radius: 8px;
+        font-family: Arial, sans-serif;
+        border: 1px solid #e5e5e5;
+      }
+      .title { font-size: 20px; font-weight: bold; margin-bottom: 16px; }
+      .text { font-size: 15px; color: #333; line-height: 1.6; margin-bottom: 20px; }
+      .button {
+        display: inline-block;
+        padding: 10px 18px;
+        background: #4a90e2;
+        color: white;
+        text-decoration: none;
+        border-radius: 6px;
+        font-size: 15px;
+      }
+      .footer {
+        margin-top: 28px;
+        font-size: 12px;
+        color: #999;
+        text-align: center;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <div class="title">Здравствуйте, {{ username }}!</div>
+
+      <div class="text">
+        Спасибо за регистрацию. Ваш аккаунт успешно создан.<br>
+        Чтобы продолжить — нажмите кнопку ниже.
+      </div>
+
+      <a class="button" href="{{ action_url }}">Продолжить</a>
+
+      <div class="footer">
+        Это письмо отправлено автоматически. Не отвечайте на него.
+      </div>
+    </div>
+  </body>
+</html>
