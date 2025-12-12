@@ -7,6 +7,7 @@ class UserSchema(BaseModel):
     username: str
     password: str
     is_active: bool
+    role: str
 
 
 class UserCreateSchema(BaseModel):
@@ -26,3 +27,4 @@ class UserResponseSchema(BaseModel):
     email: EmailStr
     username: str
     is_active: bool
+

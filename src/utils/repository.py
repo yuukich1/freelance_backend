@@ -40,8 +40,8 @@ class SQLAlchemyRepository(AbstractRepository):
         entity = result.scalar_one_or_none()
         return entity.to_schema()
     
-    async def get(self, entity_id: int) -> Optional[Any]:
-        stmt = select(self.entity).filter_by(id=entity_id)
+    async def get(self, **kwargs) -> Optional[Any]:
+        stmt = select(self.entity).filter_by(**kwargs)
         result = await self.session.execute(stmt)
         entity = result.scalar_one_or_none()
         return entity.to_schema() if entity else None

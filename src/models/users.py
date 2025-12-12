@@ -12,6 +12,7 @@ class Users(Base):
     email: Mapped[str] = mapped_column(unique=True, nullable=False)
     password: Mapped[str] = mapped_column(nullable=False)
     is_active: Mapped[bool] = mapped_column(default=False)
+    role: Mapped[str] = mapped_column(default='user')
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, nullable=False)
 
     def to_schema(self) -> UserSchema:
@@ -20,5 +21,6 @@ class Users(Base):
             email=self.email,
             username=self.username,
             password=self.password,
-            is_active=self.is_active
+            is_active=self.is_active,
+            role=self.role
         )

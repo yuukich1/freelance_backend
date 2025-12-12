@@ -1,6 +1,8 @@
+from datetime import timedelta
 import os
 from celery import Celery
 from dotenv import load_dotenv
+from fastapi.security import OAuth2PasswordBearer
 from passlib.context import CryptContext
 from loguru import logger
 import sys
@@ -28,11 +30,11 @@ celery = Celery(
 celery.autodiscover_tasks(['src.workers.tasks'])
 
 class SMTPConfig:
-    SMTP_HOST = os.getenv('SMTP_HOST', 'smtp.yandex.ru')
-    SMTP_PORT = int(os.getenv('SMTP_PORT', 587))
-    SMTP_USER = os.getenv('SMTP_USER', 'yuukich1')
-    SMTP_PASS = os.getenv('SMTP_PASS', 'password')
-    SMTP_USE_TLS = os.getenv('SMTP_USE_TLS', 'True').lower() in ['true', '1', 'yes']
+    smtp_host = os.getenv('SMTP_HOST', 'smtp.yandex.ru')
+    smtp_port = int(os.getenv('SMTP_PORT', 587))
+    smtp_user = os.getenv('SMTP_USER', 'yuukich1')
+    smtp_pass = os.getenv('SMTP_PASS', 'password')
+    smtp_use_tls = os.getenv('SMTP_USE_TLS', 'True').lower() in ['true', '1', 'yes']
 
 
 TEMPLATE_DIR = os.path.join(os.path.dirname(__file__), "templates")
@@ -46,3 +48,15 @@ env = Environment(
 def render_email(template_name, **kwargs):
     template = env.get_template(f"/email/{template_name}")
     return template.render(**kwargs)
+
+
+class SecurityConfig:
+    secret_key = os.getenv('SECRET_KEY', 'supersecretkeydefault')
+    algorithm = os.getenv('ALGORITHM', 'HS256')
+    activation_secret = os.getenv('ACTIVATION_SECRET', 'superactivationsecretdefault')
+    exp_activation = timedelta(minutes=30)
+    exp = timedelta(hours=2)
+    exp_refresh = timedelta(days=7)
+    activation_url = os.getenv('ACTIVATION_URL', 'http://localhost:8000/api/auth/activate')
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
