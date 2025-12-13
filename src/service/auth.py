@@ -2,9 +2,9 @@ from datetime import datetime
 from src.utils.unit_of_work import IUnitOfWork
 from src.schemas.user import *
 from src.schemas.auth import LoginSchema
-from src.config import pwd_context, SecurityConfig
+from src.config import pwd_context, SecurityConfig, oauth2_scheme
 from loguru import logger
-from fastapi import HTTPException, status
+from fastapi import Depends, HTTPException, status
 from src.workers.tasks import send_welcome_email_task
 from jwt import PyJWT
 
@@ -67,7 +67,7 @@ class AuthService:
         logger.info(f"login called for username='{user_login.username}'")
         async with uow:
             user = await uow.users.get(username=user_login.username)
-            if not user:
+            if not user or not pwd_context.verify(user_login.password, user.password) or not user.is_active:
                 logger.warning(f"login failed: invalid credentials for username='{user_login.username}'")
                 raise HTTPException(status_code=400, detail='invalid credetials')
             # returning access_token, refresh_token
@@ -80,10 +80,11 @@ class AuthService:
     def _create_payload(self, user: UserSchema, expires):
         payload = {
             "exp": expires,
+            'user_id': user.id,
             "username": user.username,
             "role": user.role,
         }
-        logger.debug(f"_create_payload: username='{user.username}', role='{user.role}', exp={expires}")
+        logger.debug(f"_create_payload: user_id='{user.id}', username='{user.username}', role='{user.role}', exp={expires}")
         return payload
 
     def _encode_jwt(self, payload: dict, key):
@@ -120,7 +121,9 @@ class AuthService:
         logger.debug(f"generate_activation_jwt: activation token generated for username='{user.username}' (not logged)")
         return token
     
-    async def _decode_jwt(self, token: str):
+
+    @staticmethod
+    async def __decode_jwt(token: str):
         logger.debug("_decode_jwt called (token not logged)")
         try:
             data = PyJWT().decode(token, key=SecurityConfig.secret_key, algorithms=[SecurityConfig.algorithm])
@@ -133,6 +136,7 @@ class AuthService:
             logger.exception(f"_decode_jwt: failed to decode token: {e}")
             raise HTTPException(status_code=401)
         
+
     async def __decode_activation_jwt(self, activation_token: str):
         logger.debug("__decode_activation_jwt called (token not logged)")
         try:
@@ -145,3 +149,20 @@ class AuthService:
         except Exception as e:
             logger.exception(f"error decode activation token: {e}")
             raise HTTPException(status_code=401)
+
+    @classmethod
+    async def get_admin_by_jwt(cls, token: str=Depends(oauth2_scheme)):
+        logger.debug("get_admin_by_jwt called (token not logged)")
+        user_data = await cls.__decode_jwt(token)
+        if user_data.get('role') != 'admin':
+            logger.warning(f"get_admin_by_jwt: access denied for user_id='{user_data.get('user_id')}', insufficient role")
+            raise HTTPException(status_code=403)
+        logger.info(f"get_admin_by_jwt: admin access granted for user_id='{user_data.get('user_id')}'")
+        return user_data
+    
+    @classmethod
+    async def get_user_by_jwt(cls, token: str=Depends(oauth2_scheme)):
+        logger.debug("get_user_by_jwt called (token not logged)")
+        user_data = await cls.__decode_jwt(token)
+        logger.debug(f"get_user_by_jwt: user authenticated user_id='{user_data.get('user_id')}'")
+        return user_data

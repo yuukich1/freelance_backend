@@ -8,8 +8,8 @@ class Users(Base):
     __tablename__ = "users"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    username: Mapped[str] = mapped_column(unique=True, nullable=False)
-    email: Mapped[str] = mapped_column(unique=True, nullable=False)
+    username: Mapped[str] = mapped_column(unique=True, nullable=False, index=True)
+    email: Mapped[str] = mapped_column(unique=True, nullable=False, index=True)
     password: Mapped[str] = mapped_column(nullable=False)
     is_active: Mapped[bool] = mapped_column(default=False)
     role: Mapped[str] = mapped_column(default='user')

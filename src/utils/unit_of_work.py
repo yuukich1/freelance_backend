@@ -6,6 +6,8 @@ from src.connect import async_session_maker
 class IUnitOfWork(ABC):
 
     users: UserRepository
+    services: ServicesRepository
+    categories: CategoriesRepository
 
     @abstractmethod
     async def __aenter__(self):
@@ -32,6 +34,8 @@ class UnitOfWork(IUnitOfWork):
     async def __aenter__(self):
         self.session = self.session_factory()
         self.users = UserRepository(self.session)
+        self.services = ServicesRepository(self.session)
+        self.categories = CategoriesRepository(self.session)
         
         return self
     

@@ -8,6 +8,14 @@ from loguru import logger
 import sys
 from jinja2 import Environment, FileSystemLoader
 import os
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
+from fastapi import FastAPI
+from fastapi_cache import FastAPICache
+from fastapi_cache.backends.redis import RedisBackend
+from redis import asyncio as aioredis
+from slowapi import Limiter
+from slowapi.util import get_remote_address
 
 load_dotenv()
 
@@ -60,3 +68,11 @@ class SecurityConfig:
     activation_url = os.getenv('ACTIVATION_URL', 'http://localhost:8000/api/auth/activate')
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
+
+@asynccontextmanager
+async def lifespan(_: FastAPI) -> AsyncIterator[None]:
+    redis = aioredis.from_url("redis://localhost")
+    FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache")
+    yield
+
+limiter = Limiter(key_func=get_remote_address)
