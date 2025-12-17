@@ -16,6 +16,7 @@ class Services(Base):
     category_id: Mapped[int] = mapped_column(ForeignKey('categories.id'), nullable=True)
     buyer_id: Mapped[int] = mapped_column(ForeignKey('users.id'), nullable=False)
     delivery_time: Mapped[int] = mapped_column(nullable=True)
+    status: Mapped[str] = mapped_column(default='Pending')
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, nullable=False)
 
     def to_schema(self):
@@ -26,7 +27,8 @@ class Services(Base):
             price=self.price,
             category_id=self.category_id,
             buyer_id=self.buyer_id,
-            delivery_time=self.delivery_time
+            delivery_time=self.delivery_time,
+            status=self.status
         )
 
 

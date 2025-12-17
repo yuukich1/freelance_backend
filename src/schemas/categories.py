@@ -10,3 +10,8 @@ class CategorySchema(BaseModel):
 class CategoryCreateSchema(BaseModel):
     title: str
     description: Optional[str] = None
+
+
+class CategoryUpdateSchema(BaseModel):
+    title: Optional[str] = None
+    description: Optional[str] = None

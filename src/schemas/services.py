@@ -11,5 +11,6 @@ class ServicesSchema(BaseModel):
     category_id: Optional[int] = None
     buyer_id: int
     delivery_time: Optional[int] = None
+    status: str
 
 
