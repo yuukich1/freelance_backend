@@ -72,8 +72,16 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
 
 @asynccontextmanager
 async def lifespan(_: FastAPI) -> AsyncIterator[None]:
-    redis = aioredis.from_url("redis://localhost")
-    FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache")
+    logger.info("Application startup: initializing Redis cache")
+    try:
+        redis = aioredis.from_url("redis://localhost")
+        FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache")
+        logger.info("Redis cache initialized successfully")
+    except Exception as e:
+        logger.error(f"Failed to initialize Redis cache: {e}")
+        logger.warning("Application will continue without cache")
+    logger.info("Application startup completed")
     yield
+    logger.info("Application shutdown: cleaning up resources")
 
 limiter = Limiter(key_func=get_remote_address)
