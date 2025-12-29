@@ -8,6 +8,8 @@ class IUnitOfWork(ABC):
     users: UserRepository
     services: ServicesRepository
     categories: CategoriesRepository
+    executers: ExecuterRepository
+    skills: SkillsRepository
 
     @abstractmethod
     async def __aenter__(self):
@@ -36,6 +38,8 @@ class UnitOfWork(IUnitOfWork):
         self.users = UserRepository(self.session)
         self.services = ServicesRepository(self.session)
         self.categories = CategoriesRepository(self.session)
+        self.executers = ExecuterRepository(self.session)
+        self.skills = SkillsRepository(self.session)
         
         return self
     

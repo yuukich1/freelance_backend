@@ -14,3 +14,20 @@ class ServicesSchema(BaseModel):
     status: str
 
 
+class ServiceCreateSchema(BaseModel):
+    title: str
+    description: str
+    price: Decimal
+    category_id: Optional[int] = None
+    buyer_id: Optional[int] = None
+    delivery_time: Optional[int] = None
+
+
+
+class ServiceUpdateSchema(BaseModel):
+    title: Optional[str] = None
+    description: Optional[str] = None
+    price: Optional[Decimal] = None
+    category_id: Optional[int] = None
+    delivery_time: Optional[int] = None
+    status: Optional[str] = None

@@ -11,4 +11,6 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler) # typ
 
 app.include_router(auth_router, prefix="/api/auth", tags=["auth"])
 app.include_router(categories_router, prefix='/api/categories', tags=['categories'])
-
+app.include_router(service_router, prefix='/api/services', tags=['services'])
+app.include_router(executer_router, prefix='/api/executers', tags=['executers'])
+app.include_router(skills_router, prefix='/api/skills', tags=['skills'])

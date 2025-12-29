@@ -21,6 +21,7 @@ load_dotenv()
 
 class DatabaseConfig:
     DATABASE_URL: str = os.getenv("DATABASE_URL", "sqlite+aiosqlite:///./default.db")
+    SYNC_DATABASE_URL: str = os.getenv("SYNC_DATABASE_URL", "sqlite:///./default.db")
 
 pwd_context = CryptContext(schemes=["sha256_crypt"], deprecated="auto")
 

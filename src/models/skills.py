@@ -1,22 +1,18 @@
 from sqlalchemy.orm import Mapped, mapped_column
 from src.utils.models import Base
-from src.schemas.categories import CategorySchema
 from datetime import datetime
 from sqlalchemy import DateTime
+from src.schemas.skills import SkillsSchema
 
-
-class Categories(Base):
-
-    __tablename__ = 'categories'
+class Skills(Base):
+    __tablename__ = 'skills'
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    title: Mapped[str] = mapped_column(unique=True, nullable=False, index=True)
-    description: Mapped[str]
+    title: Mapped[str] = mapped_column(nullable=False, index=True, unique=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, nullable=False)
 
     def to_schema(self):
-        return CategorySchema(
+        return SkillsSchema(
             id=self.id,
-            title=self.title,
-            description=self.description
+            title=self.title
         )
