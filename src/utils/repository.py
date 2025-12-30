@@ -45,9 +45,9 @@ class SQLAlchemyRepository(AbstractRepository):
         result = await self.session.execute(stmt)
         entity = result.scalar_one_or_none()
         return entity.to_schema() if entity else None
-    
-    async def list(self) -> List[Any]:
-        stmt = select(self.entity)
+
+    async def list(self, **kwargs) -> List[Any]:
+        stmt = select(self.entity).filter_by(**kwargs)
         result = await self.session.execute(stmt)
         return [entity.to_schema() for entity in result.scalars().all()]
     

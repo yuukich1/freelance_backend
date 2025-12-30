@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Form, Request
 from src.dependencies import UOWdep
-from src.schemas.user import UserCreateSchema, UserResponseSchema
+from src.schemas.user import UserCreateSchema
 from src.schemas.auth import LoginSchema
 from src.service.auth import AuthService
 from src.config import limiter
@@ -11,7 +11,7 @@ router = APIRouter()
 
 
 @router.post("/register")
-@limiter.limit('5/minutes')
+@limiter.limit('5/minute')
 async def register_user(request: Request, user_create: UserCreateSchema, uow: UOWdep):
     logger.info(f"POST /api/auth/register - Registration request for username='{user_create.username}', email='{user_create.email}'")
     try:
@@ -23,7 +23,7 @@ async def register_user(request: Request, user_create: UserCreateSchema, uow: UO
         raise
 
 @router.get('/activate')
-@limiter.limit('10/minutes')
+@limiter.limit('10/minute')
 async def activate_user(request: Request, activation_token: str, uow: UOWdep):
     logger.info("GET /api/auth/activate - User activation request")
     try:
@@ -36,7 +36,7 @@ async def activate_user(request: Request, activation_token: str, uow: UOWdep):
 
 
 @router.post('/login')
-@limiter.limit('5/minutes')
+@limiter.limit('10/minute')
 async def login_user(request: Request, uow: UOWdep, username: str = Form(...), password: str = Form(...)):
     logger.info(f"POST /api/auth/login - Login attempt for username='{username}'")
     try:

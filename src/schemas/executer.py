@@ -16,6 +16,9 @@ class ExecuterCreateSchema(BaseModel):
     user_id: Optional[int] = None
     skills: List[SkillsSchema] = []
 
+class ExecuterUpdateSchema(BaseModel):
+    skills: Optional[List[SkillsSchema]] = None
+
 class ExecuterDBSchema(BaseModel):
     user_id: int
     skills: dict
@@ -30,3 +33,8 @@ class ExecuterResponseSchema(BaseModel):
     user: ExecuterUserSchema
     skills: List[SkillsSchema]
     created_at: datetime
+
+class ExecuterFilters(BaseModel):
+    skills: Optional[List[str]] = None
+    username: Optional[str] = None
+    email: Optional[EmailStr] = None

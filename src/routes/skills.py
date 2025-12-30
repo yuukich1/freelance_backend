@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Request
+from fastapi_cache.decorator import cache
 from src.dependencies import UOWdep
 from src.service.skills import SkillsService
 from src.config import limiter
@@ -7,7 +8,8 @@ from loguru import logger
 router = APIRouter()
 
 @router.get("/")
-@limiter.limit('100/minutes')
+@cache(expire=3600)
+@limiter.limit('60/minute')
 async def list_skills(request: Request, uow: UOWdep):
     logger.info("GET /api/skills - List all skills request")
     try:

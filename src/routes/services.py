@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Request
-from src.schemas.services import ServiceCreateSchema, ServiceUpdateSchema, ServiceUpdateSchema
-from src.dependencies import UOWdep, UserDep, AdminDep
+from fastapi_cache.decorator import cache
+from src.schemas.services import ServiceCreateSchema, ServiceUpdateSchema
+from src.dependencies import UOWdep, UserDep
 from src.service.services import ServicesService
 from src.config import limiter
 from loguru import logger
@@ -9,7 +10,7 @@ from loguru import logger
 router = APIRouter()
 
 @router.post("/")
-@limiter.limit('10/minutes')
+@limiter.limit('10/minute')
 async def create_service(request: Request, service_data: ServiceCreateSchema, uow: UOWdep, user: UserDep):
     logger.info(f"POST /api/services - Create service request from user_id={user.get('user_id')}")
     try:
@@ -21,7 +22,8 @@ async def create_service(request: Request, service_data: ServiceCreateSchema, uo
         raise
 
 @router.get("/")
-@limiter.limit('100/minutes')
+@cache(expire=60)
+@limiter.limit('60/minute')
 async def list_services(request: Request, uow: UOWdep):
     logger.info("GET /api/services - List all services request")
     try:
@@ -33,7 +35,8 @@ async def list_services(request: Request, uow: UOWdep):
         raise
 
 @router.get("/{service_id}")
-@limiter.limit('100/minutes')
+@cache(expire=30)
+@limiter.limit('120/minute')
 async def get_service(request: Request, service_id: int, uow: UOWdep):
     logger.info(f"GET /api/services/{service_id} - Get service request")
     try:
@@ -45,7 +48,7 @@ async def get_service(request: Request, service_id: int, uow: UOWdep):
         raise
 
 @router.delete("/{service_id}")
-@limiter.limit('10/minutes')
+@limiter.limit('30/minute')
 async def delete_service(request: Request, service_id: int, uow: UOWdep, user: UserDep):
     logger.info(f"DELETE /api/services/{service_id} - Delete service request from user_id={user.get('user_id')}")
     try:
@@ -57,7 +60,7 @@ async def delete_service(request: Request, service_id: int, uow: UOWdep, user: U
         raise
 
 @router.put("/{service_id}")
-@limiter.limit('20/minutes')
+@limiter.limit('30/minute')
 async def update_service(request: Request, service_id: int, new_service_data: ServiceUpdateSchema, uow: UOWdep, user: UserDep):
     logger.info(f"PUT /api/services/{service_id} - Update service request from user_id={user.get('user_id')}")
     try:

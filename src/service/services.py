@@ -9,9 +9,9 @@ class ServicesService:
     async def add(self, uow: IUnitOfWork, service_data: ServiceCreateSchema, user: dict):
         logger.info("ServicesService.add called")
         async with uow:
-            if service_data.buyer_id is None:
+            if getattr(service_data, 'buyer_id', None) is None:
                 service_data.buyer_id = user.get('user_id')
-            logger.debug("Attempting to add service with data: {}", service_data)
+            logger.debug("Attempting to add service with data: %s", service_data)
             service = await uow.services.add(service_data)
             if service:
                 await uow.commit()
@@ -19,7 +19,7 @@ class ServicesService:
                 logger.info("Service created successfully, id={}", svc_id)
                 return service
             else:
-                logger.exception("Service could not be created for data: {}", service_data)
+                logger.exception("Service could not be created for data: %s", service_data)
                 raise HTTPException(status_code=400, detail="Service could not be created")
 
     async def get_all_service(self, uow: IUnitOfWork):
@@ -62,10 +62,8 @@ class ServicesService:
             if not (service.buyer_id == user.get('user_id') or user.get('role') == 'admin'):
                 logger.warning(f"Access denied: user_id={user.get('user_id')} attempted to update service_id={service_id}")
                 raise HTTPException(status_code=403)
-            update_data = {} 
-            for k in new_service_data.dict().keys():
-                if new_service_data.dict().get(k):
-                    update_data[k] = new_service_data.dict().get(k)
+            payload = new_service_data.dict(exclude_none=True)
+            update_data = {k: v for k, v in payload.items() if v is not None}
             logger.debug(f"Updating service {service_id} with data: {update_data}")
             updated_service = await uow.services.update(service_id, **update_data)
             await uow.commit()
